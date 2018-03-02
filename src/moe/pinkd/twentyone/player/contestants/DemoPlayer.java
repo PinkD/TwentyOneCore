@@ -9,7 +9,7 @@ public class DemoPlayer extends Player {
 
         int enemy = operationExecutor.getEnemyVisibleTotalPoint(this);
         int sum = getTotalPoint();
-        if (sum < 16 && enemy > 5) {
+        if (sum < 15) {
             operationExecutor.drawCard(this);
         }
     }

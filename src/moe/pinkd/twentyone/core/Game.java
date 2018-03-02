@@ -1,5 +1,6 @@
 package moe.pinkd.twentyone.core;
 
+import moe.pinkd.twentyone.Config;
 import moe.pinkd.twentyone.player.Player;
 
 public class Game {
@@ -23,10 +24,15 @@ public class Game {
         }
         Player winner = gameManager.getWinner();
         if (winner == null) {
-            gameManager.notifyMessage("It's a draw");
+            if (Config.DEBUG) {
+                gameManager.notifyMessage("It's a draw");
+            }
             return null;
         } else {
-            gameManager.notifyMessage("Winner is " + winner);
+            if (Config.DEBUG) {
+                gameManager.notifyMessage("Winner is " + winner);
+                gameManager.notifyMessage("-------------------------");
+            }
             return winner;
         }
     }

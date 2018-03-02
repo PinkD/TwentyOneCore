@@ -2,6 +2,7 @@ package moe.pinkd.twentyone;
 
 import moe.pinkd.twentyone.core.Game;
 import moe.pinkd.twentyone.player.Player;
+import moe.pinkd.twentyone.player.contestants.ReflectCheater;
 import moe.pinkd.twentyone.player.contestants.DemoPlayer;
 import moe.pinkd.twentyone.player.contestants.PinkD;
 
@@ -16,6 +17,7 @@ public class Main {
     public static void main(String[] args) {
         players.add(new DemoPlayer());
         players.add(new PinkD());
+        players.add(new ReflectCheater());
         for (Player player : players) {
             score.put(player, 0);
         }
@@ -29,10 +31,9 @@ public class Main {
                     }
                     players.get(i).init();
                     players.get(j).init();
-                    System.out.println("-------------------------");
                 }
             }
         }
-        System.out.println(score);
+        score.forEach((player, count) -> System.out.println(player + " wins " + count + " time(s)"));
     }
 }

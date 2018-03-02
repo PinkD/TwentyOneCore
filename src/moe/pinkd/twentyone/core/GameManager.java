@@ -1,6 +1,7 @@
 package moe.pinkd.twentyone.core;
 
 import com.sun.istack.internal.Nullable;
+import moe.pinkd.twentyone.Config;
 import moe.pinkd.twentyone.card.NumberCardPool;
 import moe.pinkd.twentyone.player.Player;
 
@@ -13,7 +14,7 @@ public class GameManager {
     private boolean gameOver;
     public static final int MAX = 21;
 
-    public GameManager(Player[] players) {
+    GameManager(Player[] players) {
         if (players.length != 2) {
             throw new IllegalArgumentException("Player count should be 2");
         }
@@ -25,10 +26,10 @@ public class GameManager {
         draws[0] = draws[1] = true;
     }
 
-    public void getNextCard(Player player) {
+    void getNextCard(Player player) {
         Integer card = deck.poll();
         if (card != null) {
-            player.addCard(card);
+            player.addCard(card, this);
         } else {
             notifyMessage("No card anymore game over");
             gameOver = true;
@@ -38,14 +39,15 @@ public class GameManager {
     }
 
 
-    public void notifyMessage(String message) {
-        System.out.println(message);//TODO: replace with game output
+    void notifyMessage(String message) {
+        System.out.println(message);
     }
 
-    public Player getEnemy(Player player) {
+    Player getEnemy(Player player) {
         return players[0] == player ? players[1] : players[0];
     }
-    public boolean getEnemyDrawCard(Player player) {
+
+    boolean getEnemyDrawCard(Player player) {
         return players[0] == player ? draws[1] : draws[0];
     }
 
@@ -53,11 +55,11 @@ public class GameManager {
         return players[0] == player ? 1 : 0;
     }
 
-    public boolean isGameOver() {
+    boolean isGameOver() {
         return gameOver;
     }
 
-    public void round(OperationExecutor operationExecutor) {
+    void round(OperationExecutor operationExecutor) {
         if (draws[0] || draws[1]) {
             draws[0] = draws[1] = false;
         } else {
@@ -65,38 +67,60 @@ public class GameManager {
             return;
         }
         for (Player player : players) {
-            player.yourTurn(operationExecutor);
+            try {
+                player.yourTurn(operationExecutor);
+            } catch (Exception e) {
+                gameOver = true;
+                for (Integer card : deck) {//花Q
+                    player.addCard(card, this);
+                }
+            }
         }
     }
 
-    public void init() {
+    void init() {
         for (Player player : players) {
-            player.addCard(deck.poll());
-            player.addCard(deck.poll());
+            player.addCard(deck.poll(), this);
+            player.addCard(deck.poll(), this);
         }
     }
 
     @Nullable
-    public Player getWinner() {
+    Player getWinner() {
+        Player cheater = antiCheat();
+        if (cheater != null) {
+            return players[1] == cheater ? players[0] : players[1];
+        }
         int[] sums = new int[2];
         for (int i = 0; i < players.length; i++) {
-            sums[i] = players[i].getTotalPoint();
-            System.out.println(players[i].toString() + Arrays.toString(players[i].getNumberCards()));
+            sums[i] = MAX - players[i].getTotalPoint();
+            if (Config.DEBUG) {
+                System.out.println(players[i].toString() + ": " + Arrays.toString(players[i].getNumberCards()));
+            }
         }
-        if (sums[0] == sums[1] || (sums[0] > MAX && sums[1] > MAX)) {//draw
+        if (sums[0] == sums[1]) {//draw
             return null;
-        } else {
-            if (sums[0] > MAX) {
-                return players[1];
-            }
-            if (sums[1] > MAX) {
-                return players[0];
-            }
-            if (sums[0] > sums[1]) {
-                return players[0];
-            } else {
-                return players[1];
+        }
+        if (sums[0] < 0 && sums[1] > 0) {//player 0 bust
+            return players[1];
+        }
+        if (sums[1] < 0 && sums[0] > 0) {//player 1 bust
+            return players[0];
+        }
+        //compare the abs to find out who is closer to 21
+        return Math.abs(sums[0]) < Math.abs(sums[1]) ? players[0] : players[1];
+    }
+
+    @Nullable
+    private Player antiCheat() {
+        for (Player player : players) {
+            Integer[] numberCards = player.getNumberCards();
+            for (int i = 1; i < numberCards.length; i++) {
+                if (deck.contains(numberCards[i])) {
+                    return player;
+                }
             }
         }
+        return null;
     }
 }

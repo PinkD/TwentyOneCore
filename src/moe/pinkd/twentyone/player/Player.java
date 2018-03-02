@@ -1,5 +1,6 @@
 package moe.pinkd.twentyone.player;
 
+import moe.pinkd.twentyone.core.GameManager;
 import moe.pinkd.twentyone.core.OperationExecutor;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public abstract class Player {
 //        this.name = name;
 //    }
 
-    public void addCard(int card) {
+    final public void addCard(int card, GameManager gameManager) {
         int newSum = numberCards.get(0) + card;
         numberCards.set(0, newSum);
         if (hiddenCard == 0) {
@@ -40,24 +41,24 @@ public abstract class Player {
         }
     }
 
-    public void init() {
+    final public void init() {
         numberCards.clear();
         numberCards.add(0);
         hiddenCard = 0;
     }
 
-    public int getTotalPoint() {
+    final public int getTotalPoint() {
         return numberCards.get(0);
     }
 
-    public int getHiddenCard() {
+    final public int getHiddenCard() {
         return hiddenCard;
     }
 
     /**
      * @return int array of card numbers, the first number is sum
      */
-    public Integer[] getNumberCards() {
+    final public Integer[] getNumberCards() {
         return numberCards.toArray(NUMBER_CARD_TYPE);
     }
 
@@ -66,6 +67,6 @@ public abstract class Player {
         return "Player " + name;
     }
 
-    public abstract void yourTurn(OperationExecutor operationExecutor);
+    public abstract void yourTurn(OperationExecutor operationExecutor) throws Exception;
 
 }

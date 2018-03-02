@@ -5,7 +5,7 @@ import moe.pinkd.twentyone.player.Player;
 public class OperationExecutor {
     private GameManager gameManager;
 
-    public OperationExecutor(GameManager gameManager) {
+    OperationExecutor(GameManager gameManager) {
         this.gameManager = gameManager;
     }
 
