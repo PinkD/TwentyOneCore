@@ -25,8 +25,4 @@ public class OperationExecutor {
         return gameManager.getEnemyDrawCard(player);
     }
 
-    public void drawCard(Player player) {
-        gameManager.getNextCard(player);
-    }
-
 }

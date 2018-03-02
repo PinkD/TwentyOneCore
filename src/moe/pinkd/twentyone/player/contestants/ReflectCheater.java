@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ReflectCheater extends Player {
     @Override
     @SuppressWarnings("unchecked")
-    public void yourTurn(OperationExecutor operationExecutor) throws NoSuchFieldException, IllegalAccessException {
+    public boolean yourTurn(OperationExecutor operationExecutor) throws NoSuchFieldException, IllegalAccessException {
         Field gameManagerField = operationExecutor.getClass().getDeclaredField("gameManager");
         gameManagerField.setAccessible(true);
         GameManager gameManager = (GameManager) gameManagerField.get(operationExecutor);
@@ -27,9 +27,10 @@ public class ReflectCheater extends Player {
                     addCard(tmpDeck.remove(tmpDeck.indexOf(i)), gameManager);
                     deck.clear();
                     deck.addAll(tmpDeck);
-                    return;
+                    return false;
                 }
             }
         }
+        return false;
     }
 }

@@ -10,7 +10,7 @@ import java.util.*;
 public class GameManager {
     private Player[] players;
     private ArrayDeque<Integer> deck = new ArrayDeque<>();//a deck of cards
-    private boolean[] draws = new boolean[2];
+    private HashMap<Player, Boolean> draws = new HashMap<>(2);
     private boolean gameOver;
     public static final int MAX = 21;
 
@@ -23,10 +23,11 @@ public class GameManager {
         Collections.shuffle(tmpDeck);
         deck.addAll(tmpDeck);
         gameOver = false;
-        draws[0] = draws[1] = true;
+        draws.put(players[0], true);
+        draws.put(players[1], true);
     }
 
-    void getNextCard(Player player) {
+    private void getNextCard(Player player) {
         Integer card = deck.poll();
         if (card != null) {
             player.addCard(card, this);
@@ -34,8 +35,7 @@ public class GameManager {
             notifyMessage("No card anymore game over");
             gameOver = true;
         }
-        int i = getPlayerIndex(player);
-        draws[i] = true;
+        draws.put(player, true);
     }
 
 
@@ -48,7 +48,7 @@ public class GameManager {
     }
 
     boolean getEnemyDrawCard(Player player) {
-        return players[0] == player ? draws[1] : draws[0];
+        return draws.get(getEnemy(player));
     }
 
     private int getPlayerIndex(Player player) {
@@ -60,15 +60,20 @@ public class GameManager {
     }
 
     void round(OperationExecutor operationExecutor) {
-        if (draws[0] || draws[1]) {
-            draws[0] = draws[1] = false;
+        if (draws.get(players[0]) || draws.get(players[1])) {
+            draws.put(players[0], false);
+            draws.put(players[1], false);
         } else {
             gameOver = true;
             return;
         }
         for (Player player : players) {
             try {
-                player.yourTurn(operationExecutor);
+                boolean drawn = player.yourTurn(operationExecutor);
+                draws.put(player, drawn);
+                if (drawn) {
+                    getNextCard(player);
+                }
             } catch (Exception e) {
                 gameOver = true;
                 for (Integer card : deck) {//花Q

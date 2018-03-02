@@ -2,9 +2,9 @@ package moe.pinkd.twentyone;
 
 import moe.pinkd.twentyone.core.Game;
 import moe.pinkd.twentyone.player.Player;
+import moe.pinkd.twentyone.player.contestants.NoDraw;
 import moe.pinkd.twentyone.player.contestants.ReflectCheater;
 import moe.pinkd.twentyone.player.contestants.DemoPlayer;
-import moe.pinkd.twentyone.player.contestants.PinkD;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ public class Main {
 
     public static void main(String[] args) {
         players.add(new DemoPlayer());
-        players.add(new PinkD());
         players.add(new ReflectCheater());
+        players.add(new NoDraw());
         for (Player player : players) {
             score.put(player, 0);
         }

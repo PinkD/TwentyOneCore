@@ -67,6 +67,6 @@ public abstract class Player {
         return "Player " + name;
     }
 
-    public abstract void yourTurn(OperationExecutor operationExecutor) throws Exception;
+    public abstract boolean yourTurn(OperationExecutor operationExecutor) throws Exception;
 
 }
